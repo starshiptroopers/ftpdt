@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 //dataStorage implements the storage ( wow :) )
-package dataStorage
+package datastorage
 
 import (
 	"errors"
@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	DefaultCacheGCInterval	= 60 //seconds
-	ERR_NFOUND = errors.New("template not found")
+	DefaultCacheGCInterval	= 60 								 //seconds
+	DefaultCacheTTL			= time.Second * time.Duration(86400) //seconds
+	ErrNFound = errors.New("template not found")
 )
 
 type MemoryDataStorage struct {
@@ -34,7 +35,7 @@ func NewMemoryDataStorage() *MemoryDataStorage {
 	}
 	return &MemoryDataStorage{
 		cache: cache,
-		DefaultCacheTTL: time.Second * time.Duration(86400),  //seconds
+		DefaultCacheTTL: DefaultCacheTTL,
 	}
 }
 
@@ -42,7 +43,7 @@ func (t *MemoryDataStorage) Get(uid string) (payload interface{}, createdAt time
 
 	r, ok := t.cache.Get(uid).(*dataRecord)
 	if !ok {
-		err = ERR_NFOUND
+		err = ErrNFound
 		return
 	}
 

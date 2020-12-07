@@ -43,12 +43,12 @@ type UID interface {
 type Driver struct {
 	ts           TemplateStorage
 	ps           DataStorage
-	uidGenerator UID			//impements
+	uidGenerator UID
 	fileCache    map[string]string
 	logger		*log.Logger
 }
 
-//
+// Stat return FileInfo for entity located at path
 func (d Driver)	Stat(filename string) (core.FileInfo, error) {
 
 	p, err := d.produce(filename)
@@ -85,7 +85,8 @@ func (rc readCloser) Close() error {
 	return nil
 }
 
-//
+// GetFile expose the content of a filename as an io.ReadCloser interface
+// returns size, io.ReadCloser interface and error on errors
 func (d Driver)	GetFile(filename string, offset int64) (int64, io.ReadCloser, error) {
 
 	p, err := d.produce(filename)
@@ -162,31 +163,37 @@ func (d Driver) produce(filepath string) (*file, error) {
 	}, nil
 }
 
+// ListDir defined to satisfy goftp driver interface, but not implemented and always returns an error
 func (d Driver)	ListDir(string, func(core.FileInfo) error) error {
 	return ERR_NOT_SUPPORTED
 }
 
+// DeleteDir defined to satisfy goftp driver interface, but not implemented and always returns an error
 func (d Driver)	DeleteDir(string) error {
 	return ERR_NOT_SUPPORTED
 }
 
+// DeleteFile defined to satisfy goftp driver interface, but not implemented and always returns an error
 func (d Driver)	DeleteFile(string) error {
 	return ERR_NOT_SUPPORTED
 }
 
+// Rename defined to satisfy goftp driver interface, but not implemented and always returns an error
 func (d Driver)	Rename(string, string) error {
 	return ERR_NOT_SUPPORTED
 }
 
+// MakeDir defined to satisfy goftp driver interface, but not implemented and always returns an error
 func (d Driver)	MakeDir(string) error {
 	return ERR_NOT_SUPPORTED
 }
 
+// PutFile defined to satisfy goftp driver interface, but not implemented and always returns an error
 func (d Driver)	PutFile(string, io.Reader, bool) (int64, error){
 	return 0, ERR_NOT_SUPPORTED
 }
 
-// Implements DriverFactory
+// Implements DriverFactory which creates Driver instance for each ftp client connection
 type DriverFactory struct {
 	ts           TemplateStorage
 	ps           DataStorage
@@ -205,6 +212,7 @@ func (factory *DriverFactory) NewDriver() (core.Driver, error) {
 	}, nil
 }
 
+//NewDriverFactory create the instance of DriverFactory
 func NewDriverFactory(ts TemplateStorage, ps DataStorage, uidGenerator UID, logger *log.Logger) *DriverFactory {
 
 	if ts == nil {

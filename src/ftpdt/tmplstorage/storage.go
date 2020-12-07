@@ -2,9 +2,8 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-//tmplStorage implements filesystem templates storage with caching features
-
-package tmplStorage
+//tmplstorage implements filesystem templates storage with caching features
+package tmplstorage
 
 import (
 	"errors"
@@ -12,6 +11,7 @@ import (
 	"github.com/astaxie/beego/cache"
 	"html/template"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -22,11 +22,13 @@ var (
  	ERR_PARSE_ERROR			= errors.New("template processing error")
 )
 
+//TemplateStorage load, caching and return the templates by their id
 type TemplateStorage struct {
 	fsroot string
 	cache	cache.Cache
 }
 
+//New create the instance of TemplateStorage with path pointed to fs root directory where templates are located
 func New(path string) *TemplateStorage {
 	rPath, err := filepath.Abs(path)
 	if err != nil {
@@ -40,19 +42,26 @@ func New(path string) *TemplateStorage {
 
 }
 
+// Template return the template.Template instance for template id or error.
+// Id is a path relative to the storage's root. If id doesn't end with '.tmpl' suffix, it will be added
+// If id is empty, "default.tmpl" will be used
 func (t *TemplateStorage) Template(id string) (*template.Template, error) {
 
-	if id == "" {
+	if id == "" || id == "/" {
 		id = "default"
 	}
-	id += ".tmpl"
+	if ! strings.HasSuffix(id, ".tmpl") {
+		id += ".tmpl"
+	}
 
 	if hit, ok := t.cache.Get(id).(*template.Template); ok {
 		return hit, nil
 	}
 
 	tPath, err := filepath.Abs(t.fsroot + string(filepath.Separator) + id)
-	if err != nil {
+
+	//preventing access outside the root folder
+	if err != nil || ! strings.HasPrefix(tPath, t.fsroot) {
 		return nil, fmt.Errorf( "%v: %s", ERR_NOT_FOUND, id)
 	}
 
