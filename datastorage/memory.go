@@ -12,15 +12,15 @@ import (
 )
 
 var (
-	DefaultCacheGCInterval	= 60 								 //seconds
-	DefaultCacheTTL			= time.Second * time.Duration(86400) //seconds
-	ErrNFound = errors.New("template not found")
+	DefaultCacheGCInterval = 60                                 //seconds
+	DefaultCacheTTL        = time.Second * time.Duration(86400) //seconds
+	ErrNFound              = errors.New("template not found")
 )
 
 type MemoryDataStorage struct {
-	cache	cache.Cache
+	cache                  cache.Cache
 	DefaultCacheGCInterval uint //seconds
-	DefaultCacheTTL time.Duration
+	DefaultCacheTTL        time.Duration
 }
 
 type dataRecord struct {
@@ -29,12 +29,12 @@ type dataRecord struct {
 }
 
 func NewMemoryDataStorage() *MemoryDataStorage {
-	cache, err := cache.NewCache("memory", `{"interval":` + string(DefaultCacheGCInterval) + "}")
+	c, err := cache.NewCache("memory", `{"interval":`+string(DefaultCacheGCInterval)+"}")
 	if err != nil {
 		panic(err)
 	}
 	return &MemoryDataStorage{
-		cache: cache,
+		cache:           c,
 		DefaultCacheTTL: DefaultCacheTTL,
 	}
 }

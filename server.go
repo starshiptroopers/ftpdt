@@ -20,7 +20,7 @@
 package ftpdt
 
 import (
-	"ftpdt/src/ftpdt/ftp"
+	"github.com/starshiptroopers/ftpdt/ftp"
 	"github.com/starshiptroopers/uidgenerator"
 	"goftp.io/server/core"
 	"io"

@@ -1,4 +1,4 @@
-module ftpdt
+module github.com/starshiptroopers/ftpdt
 
 go 1.13
 

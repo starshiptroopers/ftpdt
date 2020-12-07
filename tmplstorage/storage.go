@@ -16,16 +16,16 @@ import (
 )
 
 var (
-	DefaultCacheGCInterval  = 60     //seconds
- 	DefaultTmplCacheTTL		= time.Second * time.Duration(86400)  //seconds
- 	ERR_NOT_FOUND			= errors.New("template not found")
- 	ERR_PARSE_ERROR			= errors.New("template processing error")
+	DefaultCacheGCInterval = 60                                 //seconds
+	DefaultTmplCacheTTL    = time.Second * time.Duration(86400) //seconds
+	ERR_NOT_FOUND          = errors.New("template not found")
+	//ERR_PARSE_ERROR			= errors.New("template processing error")
 )
 
 //TemplateStorage load, caching and return the templates by their id
 type TemplateStorage struct {
 	fsroot string
-	cache	cache.Cache
+	cache  cache.Cache
 }
 
 //New create the instance of TemplateStorage with path pointed to fs root directory where templates are located
@@ -34,11 +34,11 @@ func New(path string) *TemplateStorage {
 	if err != nil {
 		panic(err)
 	}
-	cache, err := cache.NewCache("memory", `{"interval":` + string(DefaultCacheGCInterval) + "}")
+	c, err := cache.NewCache("memory", `{"interval":`+string(DefaultCacheGCInterval)+"}")
 	if err != nil {
 		panic(err)
 	}
-	return &TemplateStorage{fsroot: rPath, cache: cache}
+	return &TemplateStorage{fsroot: rPath, cache: c}
 
 }
 
@@ -50,7 +50,7 @@ func (t *TemplateStorage) Template(id string) (*template.Template, error) {
 	if id == "" || id == "/" {
 		id = "default"
 	}
-	if ! strings.HasSuffix(id, ".tmpl") {
+	if !strings.HasSuffix(id, ".tmpl") {
 		id += ".tmpl"
 	}
 
@@ -61,17 +61,17 @@ func (t *TemplateStorage) Template(id string) (*template.Template, error) {
 	tPath, err := filepath.Abs(t.fsroot + string(filepath.Separator) + id)
 
 	//preventing access outside the root folder
-	if err != nil || ! strings.HasPrefix(tPath, t.fsroot) {
-		return nil, fmt.Errorf( "%v: %s", ERR_NOT_FOUND, id)
+	if err != nil || !strings.HasPrefix(tPath, t.fsroot) {
+		return nil, fmt.Errorf("%v: %s", ERR_NOT_FOUND, id)
 	}
 
 	tmpl, err := template.ParseFiles(tPath)
 
 	if err != nil {
-		return nil, fmt.Errorf( "%v: %s", ERR_NOT_FOUND, id)
+		return nil, fmt.Errorf("%v: %s", ERR_NOT_FOUND, id)
 	}
 
-	t.cache.Put(id, tmpl, DefaultTmplCacheTTL)
+	_ = t.cache.Put(id, tmpl, DefaultTmplCacheTTL)
 
 	return tmpl, nil
 }

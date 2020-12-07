@@ -11,9 +11,9 @@ import (
 
 //implements goftp.FileInfo and os.FileInfo interfaces
 type file struct {
-	fullname 	string		//full filename
-	body		[]byte		//file file
-	created		time.Time
+	fullname string //full filename
+	body     []byte //file file
+	created  time.Time
 }
 
 func (i *file) Name() string {

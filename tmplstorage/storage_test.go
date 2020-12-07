@@ -15,14 +15,14 @@ func TestTemplateStorage(t *testing.T) {
 		t.Fatalf("Can't create temporay directory for testing, %v", err)
 		return
 	}
-	defer os.Remove(dir)
+	defer func() { _ = os.Remove(dir) }()
 
 	f, err := ioutil.TempFile(dir, "ftpdt_*.tmpl")
 	if err != nil {
 		t.Fatalf("Can't create temporay file for testing, %v", err)
 		return
 	}
-	defer os.Remove(f.Name())
+	defer func() { _ = os.Remove(f.Name()) }()
 
 	storage := New(dir)
 	if storage.cache == nil {
@@ -35,7 +35,7 @@ func TestTemplateStorage(t *testing.T) {
 		t.Fatalf("Can't write to temporary file %s: %v", f.Name(), err)
 		return
 	}
-	f.Close()
+	_ = f.Close()
 
 	tmpl, e := storage.Template(strings.TrimPrefix(f.Name(), dir))
 	if e != nil {
@@ -52,7 +52,7 @@ func TestTemplateStorage(t *testing.T) {
 		return
 	}
 
-	if ! bytes.Equal([]byte(s), buf.Bytes()) {
+	if !bytes.Equal([]byte(s), buf.Bytes()) {
 		t.Error("Wrong template processing result")
 		return
 	}

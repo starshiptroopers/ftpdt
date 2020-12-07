@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-type DummyDataStorage struct {}
+type DummyDataStorage struct{}
 
 func NewDummyDataStorage() *DummyDataStorage {
 	return &DummyDataStorage{}
@@ -23,17 +23,17 @@ func NewDummyDataStorage() *DummyDataStorage {
 
 func (t *DummyDataStorage) Get(uid string) (payload interface{}, createdAt time.Time, err error) {
 	return &struct {
-		Title string
+		Title   string
 		Caption string
-		Url string}{"Title", "Caption", "https://starshiptroopers.dev"}, time.Now(), nil
+		Url     string
+	}{"Title", "Caption", "https://starshiptroopers.dev"}, time.Now(), nil
 }
 
 func (t *DummyDataStorage) Put(uid string, payload interface{}, ttl *time.Duration) error {
 	return nil
 }
 
-
-type DummyTemplateStorage struct {}
+type DummyTemplateStorage struct{}
 
 func NewDummyTemplateStorage() *DummyTemplateStorage {
 	return &DummyTemplateStorage{}
@@ -63,8 +63,7 @@ func (t *DummyTemplateStorage) Template(id string) (*template.Template, error) {
 `)
 }
 
-
-func downloadFile( server string, path string) ( []byte, error ) {
+func downloadFile(server string, path string) ([]byte, error) {
 	c, err := ftp.Dial(server, ftp.DialWithTimeout(time.Second))
 	if err != nil {
 		return nil, fmt.Errorf("Can't connect ftp server: %v, ", err)
@@ -79,7 +78,7 @@ func downloadFile( server string, path string) ( []byte, error ) {
 	if err != nil {
 		return nil, fmt.Errorf("Can't open the remote file for download %s: %v, ", path, err)
 	}
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	buf, err := ioutil.ReadAll(r)
 
@@ -89,7 +88,6 @@ func downloadFile( server string, path string) ( []byte, error ) {
 
 	return buf, nil
 }
-
 
 func TestServer(t *testing.T) {
 
@@ -127,13 +125,13 @@ func TestServer(t *testing.T) {
 	generated := buff.Bytes()
 
 	configuration := &Opts{
-		FtpOpts: &core.ServerOpts{ Port: port, Hostname: host },
+		FtpOpts:         &core.ServerOpts{Port: port, Hostname: host},
 		TemplateStorage: tStorage,
-		DataStorage: dStorage,
-		UidGenerator: uidGenerator,
-		LogFtpDebug: true,
+		DataStorage:     dStorage,
+		UidGenerator:    uidGenerator,
+		LogFtpDebug:     true,
 	}
-	ftpd := New( configuration )
+	ftpd := New(configuration)
 
 	closeCh := make(chan error)
 
@@ -147,7 +145,7 @@ func TestServer(t *testing.T) {
 
 	//wait for server became ready
 	select {
-	case  err := <-closeCh:
+	case err := <-closeCh:
 		t.Fatalf("Can't start ftp server: %v", err)
 	//it's quite unreliable to use timeouts, but, it is simple and reasonable in this case
 	case <-time.After(time.Second):
@@ -155,23 +153,23 @@ func TestServer(t *testing.T) {
 	}
 
 	defer func() {
-		ftpd.Shutdown()
+		_ = ftpd.Shutdown()
 		//wait for server shutdown ready
 		select {
-		case  <-closeCh:
+		case <-closeCh:
 
 		case <-time.After(time.Second):
 			t.Fatalf("Server didn't stop after waiting timeout: %v", err)
 		}
 	}()
 
-	downloaded, err := downloadFile(host + ":" + strconv.Itoa(port), filename)
+	downloaded, err := downloadFile(host+":"+strconv.Itoa(port), filename)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if ! bytes.Equal(downloaded, generated) {
+	if !bytes.Equal(downloaded, generated) {
 		t.Fatal("FTP server returns a wrong file content")
 		return
 	}
