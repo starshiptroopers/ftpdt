@@ -46,16 +46,16 @@ func TestMemoryDataStorage(t *testing.T) {
 	}
 
 	if p == nil {
-		t.Error( "Get returns a null element")
+		t.Error("Get returns a null element")
 		return
 	}
 
 	if v, ok := p.(*datarecord); !ok {
-		t.Error( "The returned element type is wrong")
+		t.Error("The returned element type is wrong")
 		return
 	} else {
 		if v.body != "somebody" {
-			t.Error( "Get returns wrong data")
+			t.Error("Get returns wrong data")
 		}
 	}
 }
