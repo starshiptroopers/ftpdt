@@ -15,7 +15,7 @@ func TestMemoryDataStorage(t *testing.T) {
 		t.Error("Wrong Cache TTL value")
 	}
 
-	p, _, e := s.Get("something")
+	p, _, _, e := s.Get("something")
 	if e != ErrNFound {
 		t.Error("ErrNFound is expected for non-existing element")
 	}
@@ -35,7 +35,7 @@ func TestMemoryDataStorage(t *testing.T) {
 		t.Errorf("Error on Put: %v", e)
 	}
 
-	p, c, e := s.Get("ELEMENT1")
+	p, c, _, e := s.Get("ELEMENT1")
 	if e != nil {
 		t.Errorf("A Stored element not found: %v", e)
 	}

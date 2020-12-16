@@ -25,6 +25,7 @@ type MemoryDataStorage struct {
 
 type dataRecord struct {
 	created time.Time
+	ttl     time.Duration
 	payload interface{}
 }
 
@@ -39,7 +40,7 @@ func NewMemoryDataStorage() *MemoryDataStorage {
 	}
 }
 
-func (t *MemoryDataStorage) Get(uid string) (payload interface{}, createdAt time.Time, err error) {
+func (t *MemoryDataStorage) Get(uid string) (payload interface{}, createdAt time.Time, ttl time.Duration, err error) {
 
 	r, ok := t.cache.Get(uid).(*dataRecord)
 	if !ok {
@@ -47,7 +48,7 @@ func (t *MemoryDataStorage) Get(uid string) (payload interface{}, createdAt time
 		return
 	}
 
-	return r.payload, r.created, nil
+	return r.payload, r.created, r.ttl, nil
 }
 
 func (t *MemoryDataStorage) Put(uid string, payload interface{}, ttl *time.Duration) error {
@@ -58,6 +59,7 @@ func (t *MemoryDataStorage) Put(uid string, payload interface{}, ttl *time.Durat
 
 	return t.cache.Put(uid, &dataRecord{
 		created: time.Now(),
+		ttl:     *ttl,
 		payload: payload,
 	}, *ttl)
 }

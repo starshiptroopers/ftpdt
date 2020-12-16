@@ -21,12 +21,12 @@ func NewDummyDataStorage() *DummyDataStorage {
 	return &DummyDataStorage{}
 }
 
-func (t *DummyDataStorage) Get(uid string) (payload interface{}, createdAt time.Time, err error) {
+func (t *DummyDataStorage) Get(uid string) (payload interface{}, createdAt time.Time, ttl time.Duration, err error) {
 	return &struct {
 		Title   string
 		Caption string
 		Url     string
-	}{"Title", "Caption", "https://starshiptroopers.dev"}, time.Now(), nil
+	}{"Title", "Caption", "https://starshiptroopers.dev"}, time.Now(), 0, nil
 }
 
 func (t *DummyDataStorage) Put(uid string, payload interface{}, ttl *time.Duration) error {
@@ -115,7 +115,7 @@ func TestServer(t *testing.T) {
 		t.Fatalf("Null template has been returned for path %s, %v", path, err)
 	}
 
-	data, _, err := dStorage.Get(uid)
+	data, _, _, err := dStorage.Get(uid)
 
 	buff := bytes.NewBuffer(make([]byte, 0))
 	err = tmpl.Execute(buff, data)

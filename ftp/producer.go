@@ -30,7 +30,7 @@ type TemplateStorage interface {
 }
 
 type DataStorage interface {
-	Get(uid string) (payload interface{}, createdAt time.Time, err error)
+	Get(uid string) (payload interface{}, createdAt time.Time, ttl time.Duration, err error)
 }
 
 //UID validator
@@ -145,7 +145,7 @@ func (d Driver) produce(filepath string) (*file, error) {
 		return nil, err
 	}
 
-	payload, createdAt, err := d.ps.Get(uid)
+	payload, createdAt, _, err := d.ps.Get(uid)
 	if err != nil {
 		return nil, err
 	}
