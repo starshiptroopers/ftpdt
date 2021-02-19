@@ -63,6 +63,7 @@ func (t *DummyTemplateStorage) Template(id string) (*template.Template, error) {
 `)
 }
 
+// start ftp client connection and download the file from our ftpdt server
 func downloadFile(server string, path string) ([]byte, error) {
 	c, err := ftp.Dial(server, ftp.DialWithTimeout(time.Second))
 	if err != nil {
@@ -89,6 +90,10 @@ func downloadFile(server string, path string) ([]byte, error) {
 	return buf, nil
 }
 
+//
+// Creates ftpdt server with a testing template and data st
+// Starts ftp client and downloads the file from this ftpdt server
+// Compare the file content we got from ftpdt server  with the data we expect
 func TestServer(t *testing.T) {
 
 	port, err := freeport.GetFreePort()

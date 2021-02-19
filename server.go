@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-// ftpdt is the Ftp server library based on goftp/server and used to do a real-time files generation from templates and exposes them as downloadable files
+// ftpdt is the Ftp server library based on goftp/server and used to do a real-time files generation from templates and exposes them as ftp downloadable files
 // It was originally designed to implement the trick of escaping from Facebook's (Instagram and so-on) in-app browsers on IOS.
-// Ftp is used as an intermediate gateway to download the html file with redirect to real web server.
+// Ftp is used as an intermediate gateway to download the html file with redirect to real web site.
 // The main reason the ftp is using in this trick is because the ftp protocol is handled with Safary by default.
 // Opening a ftp link in a webkit lead to starting the Safari. At the moment of developing this library it was the only way to escape from Facebook browser to ios default browser.
 //
@@ -14,9 +14,10 @@
 // The requested ftp file is mapping to the template by its full path excluding the filename itself.
 // Then template is executed and filled with data and exposed to the ftp client as a regular file.
 // For example, if user download the file ftp://servername/example/redirect/abcde.txt, example/redirect.tmpl will be used as a template
-// and the filename is a data UID used to invoke data from DataStorage and insert them  to the template.
-// In the above example abcde will be used as uid
+// and the filename "abcde" is a UID used to invoke data from DataStorage and insert them to the template.
+//
 // ftpdt/datastorage implements a Data storage where data are stored in the memory and invoked by ftpdt request
+
 package ftpdt
 
 import (
