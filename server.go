@@ -31,6 +31,7 @@ import (
 
 type Ftpdt struct {
 	*core.Server
+	logger core.Logger
 }
 
 // Opts is a ftpdt options
@@ -67,9 +68,11 @@ func New(opts *Opts) (server *Ftpdt) {
 		ftpCfg.Auth = &ftp.AuthAnonymous{}
 	}
 
+	logger := ftp.NewDefaultFTPLogger(opts.LogWriter)
+
 	if ftpCfg.Logger == nil {
 		if opts.LogFtpDebug {
-			ftpCfg.Logger = ftp.NewDefaultFTPLogger(opts.LogWriter)
+			ftpCfg.Logger = logger
 		} else {
 			ftpCfg.Logger = &core.DiscardLogger{}
 		}
@@ -84,12 +87,12 @@ func New(opts *Opts) (server *Ftpdt) {
 		)
 	}
 
-	server = &Ftpdt{core.NewServer(&ftpCfg)}
+	server = &Ftpdt{core.NewServer(&ftpCfg), logger}
 	return
 }
 
 //ListenAndServe starts listening for ftp connection. It's blocking function
 func (ftpdt *Ftpdt) ListenAndServe() error {
-	ftpdt.Logger.Printf("", "Starting the ftp server at %s:%d", ftpdt.Hostname, ftpdt.Port)
+	ftpdt.logger.Printf("", "Starting the ftp server at %s:%d", ftpdt.Hostname, ftpdt.Port)
 	return ftpdt.Server.ListenAndServe()
 }
