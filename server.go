@@ -93,6 +93,6 @@ func New(opts *Opts) (server *Ftpdt) {
 
 //ListenAndServe starts listening for ftp connection. It's blocking function
 func (ftpdt *Ftpdt) ListenAndServe() error {
-	ftpdt.logger.Printf("", "Starting the ftp server at %s:%d", ftpdt.Hostname, ftpdt.Port)
+	ftpdt.logger.Printf("", "server has been started at %s:%d", ftpdt.Hostname, ftpdt.Port)
 	return ftpdt.Server.ListenAndServe()
 }
