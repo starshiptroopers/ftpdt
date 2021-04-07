@@ -46,7 +46,11 @@ func (t *DummyTemplateStorage) Template(id string) (*template.Template, error) {
 		return nil, errors.New("not found")
 	}
 
-	return template.New("default").Parse(`
+	return template.New("default").Funcs(template.FuncMap{
+		"toJSStr": func(s string) template.JSStr {
+			return template.JSStr(s)
+		},
+	}).Parse(`
 <!DOCTYPE html>
 <!-- This is an example template -->
 <html>
@@ -56,7 +60,7 @@ func (t *DummyTemplateStorage) Template(id string) (*template.Template, error) {
 <body>
     <h1>{{.Caption}}</h1>
 <script>
-    window.location.href = "{{.Url}}"
+    window.location.href = "{{JSStr .Url}}"
 </script>
 </body>
 </html>
@@ -178,4 +182,6 @@ func TestServer(t *testing.T) {
 		t.Fatal("FTP server returns a wrong file content")
 		return
 	}
+
+	fmt.Print(string(generated))
 }

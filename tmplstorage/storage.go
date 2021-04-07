@@ -65,7 +65,11 @@ func (t *TemplateStorage) Template(id string) (*template.Template, error) {
 		return nil, fmt.Errorf("%v: %s", ERR_NOT_FOUND, id)
 	}
 
-	tmpl, err := template.ParseFiles(tPath)
+	tmpl, err := template.New(id).Funcs(template.FuncMap{
+		"toJSStr": func(s string) template.JSStr {
+			return template.JSStr(s)
+		},
+	}).ParseFiles(tPath)
 
 	if err != nil {
 		return nil, fmt.Errorf("%v: %s", ERR_NOT_FOUND, id)
